@@ -1,0 +1,48 @@
+name: DoorDash CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️ Télécharger le code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️ Construire l’image Docker
+      - name: Build Docker image
+        run: |
+          docker build -t doordash-api .
+
+      # 3️ Lancer le conteneur
+      - name: Run Docker container
+        run: |
+          docker run -d -p 8000:8000 --name doordash-container doordash-api
+
+      # 4️ Attendre que l’API démarre
+      - name: Wait for API
+        run: sleep 5
+
+      # 5️ Tester les endpoints 
+      - name: Test API endpoints
+        run: |
+          curl -f http://localhost:8000/
+          curl -f http://localhost:8000/health
+          curl -f "http://localhost:8000/calculate-fee?distance=10"
+
+      # 6️ Afficher les logs si ça casse
+      - name: Show container logs
+        if: failure()
+        run: docker logs doordash-container
+
+      # 7️ Nettoyer (toujours)
+      - name: Stop and remove container
+        if: always()
+        run: |
+          docker stop doordash-container
+          docker rm doordash-container
