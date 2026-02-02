@@ -1,11 +1,12 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
 class DeliveryFeeRequest(BaseModel):
-    distance_km: float
-    weight_kg: float
+    distance_km: float = Field(gt=0)
+    weight_kg: float = Field(gt=0)
+
 
 @app.get("/")
 def read_root():
