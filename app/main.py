@@ -1,33 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-description = """
-This is a DoorDash (really downgraded) copycat API made for Jedha's students.
-
-Made with ❤️ by Jedha
-"""
-
-app = FastAPI(
-    title="🍔 DoorDash Delivery API",
-    description=description,
-    version="0.1",
-    contact={
-        "name": "Jedha",
-        "url": "https://jedha.co",
-    }
-)
-
-# ---------
-# MODELS
-# ---------
+app = FastAPI()
 
 class DeliveryFeeRequest(BaseModel):
     distance_km: float
     weight_kg: float
-
-# ---------
-# ROUTES
-# ---------
 
 @app.get("/")
 def read_root():
@@ -39,36 +17,9 @@ def service_status():
 
 @app.post("/calculate-fee/")
 def calculate_fee(request: DeliveryFeeRequest):
-    """
-    Calculate delivery fees
-    """
-    base_fee = 5.00
-    fee_per_km = 1.50
-    fee_per_kg = 0.50
-
-    delivery_fee = (
-        base_fee
-        + (fee_per_km * request.distance_km)
-        + (fee_per_kg * request.weight_kg)
-    )
-
-    return {"delivery_fee": delivery_fee}
-
-@app.get("/estimate-time/{distance_km}")
-def estimate_delivery_time(distance_km: float):
-    """
-    Estimate delivery time in minutes
-    """
-    base_time = 10
-    time_per_km = 5
-
-    estimated_time = base_time + (time_per_km * distance_km)
-    return {"estimated_delivery_time_minutes": estimated_time}
-
-# ---------
-# APP STARTUP (CRUCIAL FOR DOCKER)
-# ---------
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    base_fee = 5.0
+    return {
+        "delivery_fee": base_fee
+        + 1.5 * request.distance_km
+        + 0.5 * request.weight_kg
+    }
