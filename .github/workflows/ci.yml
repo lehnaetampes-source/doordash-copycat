@@ -10,20 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Récupérer le code
+      # 1️ Récupérer le code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Construire l’image Docker
+      # 2️ Construire l’image Docker
       - name: Build Docker image
         run: docker build -t doordash-api .
 
-      # 3️⃣ Lancer le conteneur
+      # 3️ Lancer le conteneur
       - name: Run Docker container
         run: |
           docker run -d -p 8000:8000 --name doordash-container doordash-api
 
-      # 4️⃣ Attendre que l’API soit vraiment prête
+      # 4️  Attendre que l’API soit vraiment prête
       - name: Wait for API
         run: |
           for i in {1..10}; do
@@ -35,18 +35,18 @@ jobs:
             sleep 3
           done
 
-      # 5️⃣ Tester les endpoints EXISTANTS
+      # 5️ Tester les endpoints EXISTANTS
       - name: Test API endpoints
         run: |
           curl -f http://localhost:8000/
           curl -f "http://localhost:8000/calculate-fee?distance=10"
 
-      # 6️⃣ Afficher les logs si ça casse
+      # 6️ Afficher les logs si ça casse
       - name: Show container logs
         if: failure()
         run: docker logs doordash-container
 
-      # 7️⃣ Nettoyage (toujours)
+      # 7️ Nettoyage 
       - name: Stop and remove container
         if: always()
         run: |
